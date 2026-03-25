@@ -14,6 +14,7 @@ interface SystemState {
     avatar: string;
     isGuest: boolean;
   } | null;
+  isCopilotOpen: boolean;
   setTheme: (theme: 'light' | 'dark') => void;
   setWallpaper: (wallpaper: string) => void;
   setVolume: (volume: number) => void;
@@ -22,6 +23,7 @@ interface SystemState {
   setLocked: (isLocked: boolean) => void;
   setBooted: (isBooted: boolean) => void;
   setUser: (user: SystemState['user']) => void;
+  setCopilotOpen: (isOpen: boolean) => void;
 }
 
 export const useSystemStore = create<SystemState>()(
@@ -43,6 +45,8 @@ export const useSystemStore = create<SystemState>()(
       setLocked: (isLocked) => set({ isLocked }),
       setBooted: (isBooted) => set({ isBooted }),
       setUser: (user) => set({ user }),
+      isCopilotOpen: false,
+      setCopilotOpen: (isCopilotOpen) => set({ isCopilotOpen }),
     }),
     {
       name: 'windows-12-system',

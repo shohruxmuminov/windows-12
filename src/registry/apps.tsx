@@ -10,7 +10,8 @@ import {
   ShoppingBag, 
   PlaySquare, 
   Image as ImageIcon, 
-  CheckSquare 
+  CheckSquare,
+  Palette
 } from 'lucide-react';
 
 import ExplorerApp from '@/apps/ExplorerApp';
@@ -24,6 +25,7 @@ import StoreApp from '@/apps/StoreApp';
 import MediaPlayerApp from '@/apps/MediaPlayerApp';
 import GalleryApp from '@/apps/GalleryApp';
 import TodoApp from '@/apps/TodoApp';
+import PaintApp from '@/apps/PaintApp';
 
 export interface AppDefinition {
   id: string;
@@ -144,6 +146,16 @@ export const APPS: Record<string, AppDefinition> = {
     component: TodoApp,
     defaultSize: { width: 400, height: 600 },
     minSize: { width: 350, height: 400 },
+    resizable: true,
+    pinned: false,
+  },
+  paint: {
+    id: 'paint',
+    name: 'Paint',
+    icon: Palette as any,
+    component: PaintApp as any,
+    defaultSize: { width: 900, height: 700 },
+    minSize: { width: 600, height: 500 },
     resizable: true,
     pinned: false,
   }

@@ -27,7 +27,8 @@ const defaultFiles: FileItem[] = [
   { id: 'welcome_txt', name: 'Welcome.txt', type: 'file', mimeType: 'text/plain', parentId: 'desktop', content: 'Welcome to Windows 12 Web Simulator!\n\nThis is a fully interactive React application.', createdAt: Date.now(), updatedAt: Date.now() },
   { id: 'browser_shortcut', name: 'Edge', type: 'file', mimeType: 'shortcut', parentId: 'desktop', targetAppId: 'browser', createdAt: Date.now(), updatedAt: Date.now() },
   { id: 'explorer_shortcut', name: 'File Explorer', type: 'file', mimeType: 'shortcut', parentId: 'desktop', targetAppId: 'explorer', createdAt: Date.now(), updatedAt: Date.now() },
-  { id: 'terminal_shortcut', name: 'Terminal', type: 'file', mimeType: 'shortcut', parentId: 'desktop', targetAppId: 'terminal', createdAt: Date.now(), updatedAt: Date.now() }
+  { id: 'terminal_shortcut', name: 'Terminal', type: 'file', mimeType: 'shortcut', parentId: 'desktop', targetAppId: 'terminal', createdAt: Date.now(), updatedAt: Date.now() },
+  { id: 'paint_shortcut', name: 'Paint', type: 'file', mimeType: 'shortcut', parentId: 'desktop', targetAppId: 'paint', createdAt: Date.now(), updatedAt: Date.now() }
 ];
 
 interface FileSystemState {

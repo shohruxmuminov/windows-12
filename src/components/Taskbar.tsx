@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useWindowStore } from '@/store/windowStore';
 import { APPS } from '@/registry/apps';
-import { Search, Grid, Wifi, Volume2, Battery, ChevronUp } from 'lucide-react';
+import { useSystemStore } from '@/store/systemStore';
+import { Search, Grid, Wifi, Volume2, Battery, ChevronUp, Sparkles } from 'lucide-react';
 import StartMenu from './StartMenu';
 
 export default function Taskbar() {
@@ -9,6 +10,7 @@ export default function Taskbar() {
   const [time, setTime] = useState(new Date());
 
   const { windows, focusedWindowId, minimizeWindow, restoreWindow, focusWindow, openWindow } = useWindowStore();
+  const { isCopilotOpen, setCopilotOpen } = useSystemStore();
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -47,6 +49,14 @@ export default function Taskbar() {
           {/* Search Button */}
           <button className="p-2 rounded-md hover:bg-white/10 transition-all group">
             <Search className="w-5 h-5 opacity-80 group-hover:opacity-100" />
+          </button>
+
+          {/* Copilot Button */}
+          <button 
+            className={`p-2 rounded-md transition-all group ${isCopilotOpen ? 'bg-blue-600/20 shadow-inner' : 'hover:bg-white/10'}`}
+            onClick={() => setCopilotOpen(!isCopilotOpen)}
+          >
+            <Sparkles className={`w-5 h-5 ${isCopilotOpen ? 'text-blue-400' : 'opacity-80 group-hover:text-blue-400 opacity-100'} transition-colors`} />
           </button>
 
           <div className="w-px h-6 bg-white/20 mx-1" />
