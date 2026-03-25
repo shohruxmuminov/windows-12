@@ -65,7 +65,7 @@ export default function BrowserApp({ windowId }: { windowId: string }) {
             }`}
           >
             <div className="w-3 h-3 rounded-full bg-blue-500 shrink-0" />
-            <span className="truncate flex-1">{tab.title}</span>
+            <span className="truncate flex-1">{tab.title || 'New Tab'}</span>
             <button 
               className="p-1 rounded-full hover:bg-slate-300 dark:hover:bg-white/20 shrink-0"
               onClick={(e) => closeTab(tab.id, e)}
@@ -94,29 +94,23 @@ export default function BrowserApp({ windowId }: { windowId: string }) {
           <button className="p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition" onClick={() => { setLoading(true); setTimeout(() => setLoading(false), 500); }}>
             <RotateCw size={16} className={loading ? 'animate-spin' : ''} />
           </button>
-          <button className="p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition">
-            <Home size={18} />
-          </button>
         </div>
 
         <form onSubmit={handleNavigate} className="flex-1 flex items-center bg-white dark:bg-black/40 border border-slate-300 dark:border-white/10 rounded-full px-4 py-1.5 focus-within:ring-2 ring-blue-500/50">
-           <Search size={14} className="opacity-50 mr-2" />
+           <Globe size={14} className="opacity-50 mr-2" />
            <input 
              type="text" 
              value={urlInput}
              onChange={(e) => setUrlInput(e.target.value)}
              className="flex-1 bg-transparent border-none outline-none text-sm placeholder:text-slate-400"
-             placeholder="Search the web or type a URL"
+             placeholder="Search or type URL"
            />
-           <button type="button" className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-white/10 text-slate-500 dark:text-slate-400">
-             <Star size={14} />
+           <button type="submit" className="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-white/10 text-blue-500">
+             <Search size={14} />
            </button>
         </form>
 
         <div className="flex items-center gap-1">
-          <button className="p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition">
-            <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">D</div>
-          </button>
           <button className="p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition">
             <MoreVertical size={18} />
           </button>
@@ -124,34 +118,34 @@ export default function BrowserApp({ windowId }: { windowId: string }) {
       </div>
 
       {/* Browser Viewport */}
-      <div className="flex-1 bg-white dark:bg-slate-950 relative overflow-hidden">
-        {loading ? (
-          <div className="absolute inset-0 flex items-center justify-center">
+      <div className="flex-1 bg-white relative overflow-hidden">
+        {loading && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
           </div>
-        ) : currentUrl === 'windows12.dev' || currentUrl === '' ? (
-          <div className="h-full flex flex-col items-center justify-center text-center p-8 bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-800">
-            <h1 className="text-5xl font-light mb-6">Windows 12 Demo Homepage</h1>
-            <p className="max-w-md text-slate-600 dark:text-slate-400 mb-8">
-              Welcome to the simulated Edge Browser. Since this is an iframe environment inside a React app, external websites may refuse to connect due to cross-origin policies (X-Frame-Options: SAMEORIGIN).
-            </p>
-            <div className="flex gap-4">
-              <a href="https://wikipedia.org" target="_blank" rel="noreferrer" className="px-6 py-2 bg-blue-600 text-white rounded shadow hover:bg-blue-500 transition">Open Wikipedia in new tab</a>
-              <button 
-                onClick={() => { setUrlInput('wikipedia.org'); setTabs(tabs.map(t => t.id === activeTab ? {...t, url: 'wikipedia.org'} : t)); handleNavigate({preventDefault: () => {}} as any); }}
-                className="px-6 py-2 bg-slate-300 dark:bg-white/10 rounded shadow hover:bg-slate-400 dark:hover:bg-white/20 transition"
-              >
-                Try an Iframe
-              </button>
-            </div>
-          </div>
-        ) : (
+        )}
+        
+        {currentUrl ? (
           <iframe 
-            src={currentUrl.startsWith('http') ? currentUrl : `https://${currentUrl}`} 
+            src={currentUrl} 
             className="w-full h-full border-none"
             title="Browser Viewport"
             sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+            onLoad={() => setLoading(false)}
           />
+        ) : (
+          <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-slate-50 to-slate-200 dark:from-slate-900 dark:to-slate-800">
+             <Search size={48} className="text-blue-500 mb-4 opacity-50" />
+             <h2 className="text-2xl font-light mb-2">Search the Web</h2>
+             <p className="text-sm opacity-60 max-w-sm">Enter a URL or search query to begin browsing.</p>
+          </div>
+        )}
+        
+        {/* Iframe Warning Overlay (Subtle) */}
+        {!loading && currentUrl && (
+          <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 backdrop-blur text-white text-[8px] rounded opacity-40 hover:opacity-100 transition-opacity pointer-events-none">
+             External sites may block iframes.
+          </div>
         )}
       </div>
     </div>

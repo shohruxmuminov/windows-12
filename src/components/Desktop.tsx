@@ -8,6 +8,9 @@ import WindowManager from './WindowManager';
 import Taskbar from './Taskbar';
 import ContextMenu from './ContextMenu';
 import Copilot from './Copilot';
+import WidgetsPanel from './WidgetsPanel';
+import QuickSettings from './QuickSettings';
+import Window from './Window';
 
 export default function Desktop() {
   const { wallpaper } = useSystemStore();
@@ -47,7 +50,9 @@ export default function Desktop() {
 
       {/* Copilot Sidebar */}
       <Copilot />
-
+      <WidgetsPanel />
+      <QuickSettings />
+      
       {/* Taskbar Layer */}
       <Taskbar />
 

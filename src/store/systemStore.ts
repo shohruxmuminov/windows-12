@@ -15,6 +15,8 @@ interface SystemState {
     isGuest: boolean;
   } | null;
   isCopilotOpen: boolean;
+  isWidgetsOpen: boolean;
+  isQuickSettingsOpen: boolean;
   setTheme: (theme: 'light' | 'dark') => void;
   setWallpaper: (wallpaper: string) => void;
   setVolume: (volume: number) => void;
@@ -24,6 +26,8 @@ interface SystemState {
   setBooted: (isBooted: boolean) => void;
   setUser: (user: SystemState['user']) => void;
   setCopilotOpen: (isOpen: boolean) => void;
+  setWidgetsOpen: (isOpen: boolean) => void;
+  setQuickSettingsOpen: (isOpen: boolean) => void;
 }
 
 export const useSystemStore = create<SystemState>()(
@@ -47,6 +51,10 @@ export const useSystemStore = create<SystemState>()(
       setUser: (user) => set({ user }),
       isCopilotOpen: false,
       setCopilotOpen: (isCopilotOpen) => set({ isCopilotOpen }),
+      isWidgetsOpen: false,
+      setWidgetsOpen: (isWidgetsOpen) => set({ isWidgetsOpen }),
+      isQuickSettingsOpen: false,
+      setQuickSettingsOpen: (isQuickSettingsOpen) => set({ isQuickSettingsOpen }),
     }),
     {
       name: 'windows-12-system',

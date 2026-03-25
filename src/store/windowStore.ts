@@ -22,6 +22,7 @@ interface WindowState {
   restoreWindow: (id: string) => void;
   updateWindowPosition: (id: string, position: { x: number; y: number }) => void;
   updateWindowSize: (id: string, size: { width: number; height: number }) => void;
+  snapWindow: (id: string, type: 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right') => void;
   closeAll: () => void;
 }
 

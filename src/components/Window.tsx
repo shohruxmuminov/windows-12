@@ -22,8 +22,11 @@ export default function Window({ windowState, appDef }: WindowProps) {
     restoreWindow,
     updateWindowPosition,
     updateWindowSize,
+    snapWindow,
     focusedWindowId
   } = useWindowStore();
+
+  const [showSnapLayouts, setShowSnapLayouts] = useState(false);
 
   const isFocused = focusedWindowId === windowState.id;
   const isMaximized = windowState.isMaximized;
@@ -47,16 +50,56 @@ export default function Window({ windowState, appDef }: WindowProps) {
         <Minus size={14} />
       </button>
       {appDef.resizable && (
-        <button 
-          className="p-3 hover:bg-white/10 transition-colors"
-          onClick={(e) => {
-            e.stopPropagation();
-            isMaximized ? restoreWindow(windowState.id) : maximizeWindow(windowState.id);
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
+        <div 
+          className="relative group"
+          onMouseEnter={() => setShowSnapLayouts(true)}
+          onMouseLeave={() => setShowSnapLayouts(false)}
         >
-          {isMaximized ? <Copy size={14} className="rotate-180" /> : <Square size={12} />}
-        </button>
+          <button 
+            className="p-3 hover:bg-white/10 transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              isMaximized ? restoreWindow(windowState.id) : maximizeWindow(windowState.id);
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+          >
+            {isMaximized ? <Copy size={14} className="rotate-180" /> : <Square size={12} />}
+          </button>
+
+          {showSnapLayouts && (
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 w-48 bg-slate-800/95 backdrop-blur-xl border border-white/20 rounded-lg shadow-2xl p-3 grid grid-cols-2 gap-2 z-[100] animate-in fade-in zoom-in duration-150">
+               {/* Snap Options */}
+               <button 
+                 onClick={() => { snapWindow(windowState.id, 'left'); setShowSnapLayouts(false); }}
+                 className="h-12 border border-white/10 rounded hover:bg-blue-500/30 transition-colors flex items-center justify-center"
+                 title="Snap Left"
+               >
+                 <div className="w-full h-full flex"><div className="w-1/2 h-full bg-blue-500/40 border-r border-white/20" /></div>
+               </button>
+               <button 
+                 onClick={() => { snapWindow(windowState.id, 'right'); setShowSnapLayouts(false); }}
+                 className="h-12 border border-white/10 rounded hover:bg-blue-500/30 transition-colors flex items-center justify-center"
+                 title="Snap Right"
+               >
+                 <div className="w-full h-full flex"><div className="w-1/2 h-full ml-auto bg-blue-500/40 border-l border-white/20" /></div>
+               </button>
+               <button 
+                 onClick={() => { snapWindow(windowState.id, 'top-left'); setShowSnapLayouts(false); }}
+                 className="h-12 border border-white/10 rounded hover:bg-blue-500/30 transition-colors flex items-center justify-center overflow-hidden"
+                 title="Top Left"
+               >
+                 <div className="w-1/2 h-1/2 bg-blue-500/40 border-r border-b border-white/10 self-start mr-auto" />
+               </button>
+               <button 
+                 onClick={() => { snapWindow(windowState.id, 'bottom-right'); setShowSnapLayouts(false); }}
+                 className="h-12 border border-white/10 rounded hover:bg-blue-500/30 transition-colors flex items-center justify-center overflow-hidden"
+                 title="Bottom Right"
+               >
+                 <div className="w-1/2 h-1/2 bg-blue-500/40 border-l border-t border-white/10 self-end ml-auto" />
+               </button>
+            </div>
+          )}
+        </div>
       )}
       <button 
         className="p-3 hover:bg-red-500 hover:text-white transition-colors text-white"
