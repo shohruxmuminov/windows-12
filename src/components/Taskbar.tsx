@@ -8,7 +8,7 @@ export default function Taskbar() {
   const [startOpen, setStartOpen] = useState(false);
   const [time, setTime] = useState(new Date());
 
-  const { windows, focusedWindowId, minimizeWindow, restoreWindow, focusWindow } = useWindowStore();
+  const { windows, focusedWindowId, minimizeWindow, restoreWindow, focusWindow, openWindow } = useWindowStore();
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);

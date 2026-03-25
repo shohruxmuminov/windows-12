@@ -28,7 +28,7 @@ export const useSystemStore = create<SystemState>()(
   persist(
     (set) => ({
       theme: 'dark',
-      wallpaper: '/wallpapers/default.jpg', // We will use a nice default color/gradient if missing
+      wallpaper: 'linear-gradient(to right, #4facfe 0%, #00f2fe 100%)', // Default gradient
       volume: 80,
       brightness: 100,
       isMuted: false,

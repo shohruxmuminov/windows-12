@@ -17,7 +17,8 @@ export default function Desktop() {
     <div 
       className="relative w-screen h-screen overflow-hidden bg-black text-white"
       style={{
-        backgroundImage: `url(${wallpaper})`,
+        backgroundImage: wallpaper.startsWith('linear-gradient') ? 'none' : `url(${wallpaper})`,
+        background: wallpaper.startsWith('linear-gradient') ? wallpaper : undefined,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
       }}

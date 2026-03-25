@@ -42,7 +42,7 @@ export default function BrowserApp({ windowId }: { windowId: string }) {
     const newId = Date.now();
     setTabs([...tabs, { id: newId, title: 'New Tab', url: '' }]);
     setActiveTab(newId);
-    seturlInput('');
+    setUrlInput('');
     setCurrentUrl('');
   };
 

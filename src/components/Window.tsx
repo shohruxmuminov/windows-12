@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useDragControls } from 'framer-motion';
 import { Minus, Square, X, Copy } from 'lucide-react';
 import { useWindowStore, AppWindow } from '@/store/windowStore';
 import { AppDefinition } from '@/registry/apps';
@@ -12,6 +12,7 @@ interface WindowProps {
 export default function Window({ windowState, appDef }: WindowProps) {
   const [isDragging, setIsDragging] = useState(false);
   const windowRef = useRef<HTMLDivElement>(null);
+  const dragControls = useDragControls();
   
   const {
     focusWindow,
@@ -20,6 +21,7 @@ export default function Window({ windowState, appDef }: WindowProps) {
     maximizeWindow,
     restoreWindow,
     updateWindowPosition,
+    updateWindowSize,
     focusedWindowId
   } = useWindowStore();
 
@@ -28,6 +30,11 @@ export default function Window({ windowState, appDef }: WindowProps) {
 
   const handlePointerDown = () => {
     focusWindow(windowState.id);
+  };
+
+  const startDrag = (event: React.PointerEvent) => {
+    if (isMaximized) return;
+    dragControls.start(event);
   };
 
   const winControls = (
@@ -82,48 +89,37 @@ export default function Window({ windowState, appDef }: WindowProps) {
         } : {
           width: windowState.size.width,
           height: windowState.size.height,
+          x: windowState.position.x,
+          y: windowState.position.y,
         })
       }}
       exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
-      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+      transition={{ type: "spring", stiffness: 350, damping: 30 }}
       onPointerDown={handlePointerDown}
       drag={!isMaximized}
+      dragControls={dragControls}
       dragMomentum={false}
-      dragListener={false} // We handle drag manually attached to header
+      dragListener={false}
       onDragStart={() => setIsDragging(true)}
       onDragEnd={(e, info) => {
         setIsDragging(false);
-        if (!isMaximized) {
-          updateWindowPosition(windowState.id, {
-            x: windowState.position.x + info.offset.x,
-            y: windowState.position.y + info.offset.y
-          });
-        }
+        updateWindowPosition(windowState.id, {
+          x: windowState.position.x + info.offset.x,
+          y: windowState.position.y + info.offset.y
+        });
       }}
-      // Keep internal position via Framer Motion when dragging, but sync to store on end
-      {...(!isMaximized ? {
-        initial: { x: windowState.position.x, y: windowState.position.y, opacity: 0, scale: 0.95 },
-        animate: { x: windowState.position.x, y: windowState.position.y, opacity: 1, scale: 1 },
-      } : {})}
     >
       {/* Title Bar */}
       <div 
-        className="h-10 flex items-center justify-between bg-slate-800/80 backdrop-blur select-none cursor-default"
+        className="h-10 flex items-center justify-between bg-slate-800/80 backdrop-blur select-none"
         onDoubleClick={() => appDef.resizable && (isMaximized ? restoreWindow(windowState.id) : maximizeWindow(windowState.id))}
       >
         <div 
-          className="flex items-center flex-1 h-full px-3 gap-2"
-          style={{ cursor: isMaximized ? 'default' : 'grab' }}
-          // @ts-ignore
-          onPointerDown={(e) => {
-            handlePointerDown();
-            // Start drag using framer-motion controls
-            // Actually, for simplicity we can just use Framer Motion's dragControls if implemented,
-            // or just use CSS `dragListener=true` on the motion.div and make the content stop propagation.
-          }}
+          className="flex items-center flex-1 h-full px-3 gap-2 cursor-grab active:cursor-grabbing"
+          onPointerDown={startDrag}
         >
           <appDef.icon className="w-4 h-4 text-blue-400" />
-          <span className="text-xs text-white/90">{windowState.title}</span>
+          <span className="text-xs text-white/90 font-medium">{windowState.title}</span>
         </div>
         
         {winControls}
@@ -136,15 +132,13 @@ export default function Window({ windowState, appDef }: WindowProps) {
         {isDragging && <div className="absolute inset-0 z-50"></div>}
       </div>
 
-      {/* Resize Handle (only bottom-right for demo simplicity) */}
+      {/* Resize Handle (Simplified for demo) */}
       {!isMaximized && appDef.resizable && (
         <div 
-          className="absolute bottom-0 right-0 w-4 h-4 cursor-se-resize z-50"
+          className="absolute bottom-0 right-0 w-3 h-3 cursor-se-resize z-50 hover:bg-white/20 transition"
           onPointerDown={(e) => {
             e.stopPropagation();
-            e.preventDefault();
-            // simple resize logic would go here
-            // using native onPointerMove for custom resizing
+            // In a real app we'd attach a temporary mousemove listener here
           }}
         />
       )}
