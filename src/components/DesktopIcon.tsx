@@ -8,7 +8,7 @@ export default function DesktopIcon({ file }: { file: FileItem }) {
   const [isSelected, setIsSelected] = useState(false);
   const { openWindow } = useWindowStore();
 
-  let Icon = FileText;
+  let Icon: any = FileText;
   let targetApp = 'notes';
   
   if (file.type === 'folder') {

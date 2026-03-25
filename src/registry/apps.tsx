@@ -28,7 +28,7 @@ import TodoApp from '@/apps/TodoApp';
 export interface AppDefinition {
   id: string;
   name: string;
-  icon: FC<{ className?: string }>;
+  icon: any;
   component: FC<{ windowId: string }>;
   defaultSize: { width: number; height: number };
   minSize: { width: number; height: number };
@@ -80,7 +80,7 @@ export const APPS: Record<string, AppDefinition> = {
   notes: {
     id: 'notes',
     name: 'Notes',
-    icon: FileText,
+    icon: FileText as any,
     component: NotesApp,
     defaultSize: { width: 600, height: 500 },
     minSize: { width: 300, height: 300 },
