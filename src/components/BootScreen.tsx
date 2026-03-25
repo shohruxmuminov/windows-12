@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useSystemStore } from '@/store/systemStore';
 import { Loader2 } from 'lucide-react';
+import { soundManager } from '@/utils/SoundManager';
 
 export default function BootScreen() {
   const [progress, setProgress] = useState(0);
@@ -12,7 +13,8 @@ export default function BootScreen() {
       setProgress(p => {
         if (p >= 100) {
           clearInterval(timer);
-          setTimeout(() => setBooted(true), 500);
+          soundManager.play('startup');
+          setTimeout(() => setBooted(true), 1500); // Wait a bit more for the sound
           return 100;
         }
         return p + Math.random() * 15;

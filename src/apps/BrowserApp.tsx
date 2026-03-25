@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, RotateCw, Home, Search, Star, MoreVertical, Plus, X, Globe } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCw, Home, Search, Star, MoreVertical, Plus, X, Globe, Shield } from 'lucide-react';
 
 export default function BrowserApp({ windowId }: { windowId: string }) {
   const [urlInput, setUrlInput] = useState('windows12.dev');
@@ -7,6 +7,22 @@ export default function BrowserApp({ windowId }: { windowId: string }) {
   const [tabs, setTabs] = useState([{ id: 1, title: 'Windows 12 Simulation', url: 'windows12.dev' }]);
   const [activeTab, setActiveTab] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [isProxyEnabled, setIsProxyEnabled] = useState(false);
+
+  const verifiedSites = [
+    { id: 'bing', name: 'Bing', url: 'https://www.bing.com', icon: 'https://www.bing.com/favicon.ico' },
+    { id: 'wikipedia', name: 'Wikipedia', url: 'https://www.wikipedia.org', icon: 'https://www.wikipedia.org/favicon.ico' },
+    { id: 'reddit', name: 'Reddit', url: 'https://www.reddit.com', icon: 'https://www.reddit.com/favicon.ico' },
+    { id: 'duckduckgo', name: 'DuckDuckGo', url: 'https://duckduckgo.com', icon: 'https://duckduckgo.com/favicon.ico' },
+  ];
+
+  const getIframeUrl = () => {
+    if (!currentUrl) return '';
+    if (isProxyEnabled) {
+      return `https://api.allorigins.win/raw?url=${encodeURIComponent(currentUrl)}`;
+    }
+    return currentUrl;
+  };
 
   const handleNavigate = (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,6 +127,13 @@ export default function BrowserApp({ windowId }: { windowId: string }) {
         </form>
 
         <div className="flex items-center gap-1">
+          <button 
+            title="Toggle Unrestricted Mode"
+            onClick={() => setIsProxyEnabled(!isProxyEnabled)}
+            className={`p-1.5 rounded-full transition ${isProxyEnabled ? 'bg-blue-600 text-white' : 'hover:bg-slate-200 dark:hover:bg-white/10'}`}
+          >
+            <Shield size={18} />
+          </button>
           <button className="p-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-white/10 transition">
             <MoreVertical size={18} />
           </button>
@@ -118,7 +141,7 @@ export default function BrowserApp({ windowId }: { windowId: string }) {
       </div>
 
       {/* Browser Viewport */}
-      <div className="flex-1 bg-white relative overflow-hidden">
+      <div className="flex-1 bg-white dark:bg-[#1a1a1a] relative overflow-hidden flex flex-col">
         {loading && (
           <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
@@ -126,25 +149,74 @@ export default function BrowserApp({ windowId }: { windowId: string }) {
         )}
         
         {currentUrl ? (
-          <iframe 
-            src={currentUrl} 
-            className="w-full h-full border-none"
-            title="Browser Viewport"
-            sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
-            onLoad={() => setLoading(false)}
-          />
-        ) : (
-          <div className="h-full flex flex-col items-center justify-center p-8 text-center bg-gradient-to-br from-slate-50 to-slate-200 dark:from-slate-900 dark:to-slate-800">
-             <Search size={48} className="text-blue-500 mb-4 opacity-50" />
-             <h2 className="text-2xl font-light mb-2">Search the Web</h2>
-             <p className="text-sm opacity-60 max-w-sm">Enter a URL or search query to begin browsing.</p>
+          <div className="flex-1 flex flex-col">
+            <div className="bg-blue-600 text-white text-[10px] py-1 px-4 flex justify-between items-center shrink-0">
+               <span className="truncate mr-4">Viewing: {currentUrl}</span>
+               <div className="flex gap-4 shrink-0">
+                  <button 
+                    onClick={() => window.open(currentUrl, '_blank')}
+                    className="hover:underline font-bold"
+                  >
+                    Open in New Tab ↗
+                  </button>
+                  <button 
+                    onClick={() => setIsProxyEnabled(!isProxyEnabled)}
+                    className="hover:underline font-bold"
+                  >
+                    {isProxyEnabled ? 'Standard Mode' : 'Unrestricted Mode'}
+                  </button>
+               </div>
+            </div>
+            <iframe 
+              src={getIframeUrl()} 
+              className="flex-1 w-full border-none bg-white"
+              title="Browser Viewport"
+              sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
+              onLoad={() => setLoading(false)}
+            />
           </div>
-        )}
-        
-        {/* Iframe Warning Overlay (Subtle) */}
-        {!loading && currentUrl && (
-          <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 backdrop-blur text-white text-[8px] rounded opacity-40 hover:opacity-100 transition-opacity pointer-events-none">
-             External sites may block iframes.
+        ) : (
+          <div className="flex-1 overflow-y-auto p-12 bg-gradient-to-br from-slate-50 to-slate-200 dark:from-slate-900 dark:to-slate-800">
+             <div className="max-w-4xl mx-auto">
+               <div className="flex flex-col items-center text-center mb-12">
+                 <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl mb-6">
+                   <Globe size={40} />
+                 </div>
+                 <h2 className="text-4xl font-bold mb-4 tracking-tight">Microsoft Edge</h2>
+                 <p className="text-lg opacity-60 max-w-lg">Discover the web with the next-generation desktop browser.</p>
+               </div>
+
+               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                 {verifiedSites.map(site => (
+                   <button
+                     key={site.id}
+                     onClick={() => {
+                        setUrlInput(site.url);
+                        setCurrentUrl(site.url);
+                        setTabs(tabs.map(t => t.id === activeTab ? { ...t, url: site.url, title: site.name } : t));
+                        setLoading(true);
+                     }}
+                     className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 p-6 rounded-2xl flex flex-col items-center gap-4 hover:shadow-xl hover:scale-105 transition-all group"
+                   >
+                     <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-white/10 flex items-center justify-center p-2 group-hover:bg-blue-600/10 transition-colors">
+                        <img src={site.icon} alt={site.name} className="w-8 h-8 object-contain" onError={(e) => (e.currentTarget.style.display = 'none')} />
+                        <Globe size={24} className="text-blue-500" />
+                     </div>
+                     <span className="font-semibold text-sm">{site.name}</span>
+                   </button>
+                 ))}
+                 
+                 <button
+                   onClick={() => window.open('https://youtube.com', '_blank')}
+                   className="bg-rose-600/10 border border-rose-500/20 p-6 rounded-2xl flex flex-col items-center gap-4 hover:shadow-xl hover:scale-105 transition-all text-rose-500"
+                 >
+                   <div className="w-12 h-12 rounded-xl bg-rose-600 flex items-center justify-center text-white">
+                      <Search size={24} />
+                   </div>
+                   <span className="font-semibold text-sm">YouTube ↗</span>
+                 </button>
+               </div>
+             </div>
           </div>
         )}
       </div>

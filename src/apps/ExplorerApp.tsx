@@ -5,21 +5,50 @@ import { APPS } from '@/registry/apps';
 import { Folder, FileText, ChevronLeft, ChevronRight, ChevronUp, RotateCw, Search, Home, Monitor, Music, Image as ImageIcon, Video, Trash2, LayoutGrid, List } from 'lucide-react';
 
 export default function ExplorerApp({ windowId }: { windowId: string }) {
-  const { files } = useFileSystemStore();
+  const { files, createFolder, deleteFile, renameFile } = useFileSystemStore();
   const { openWindow } = useWindowStore();
   const [currentPath, setCurrentPath] = useState<string[]>(['root']);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [selectedFileId, setSelectedFileId] = useState<string | null>(null);
   
   const currentFolderId = currentPath[currentPath.length - 1];
   const currentFiles = files.filter(f => f.parentId === currentFolderId);
 
+  const handleNewFolder = () => {
+    const name = prompt('Enter folder name:', 'New Folder');
+    if (name) {
+      createFolder(name, currentFolderId);
+    }
+  };
+
+  const handleDelete = () => {
+    if (selectedFileId) {
+      if (confirm('Are you sure you want to delete this item?')) {
+        deleteFile(selectedFileId);
+        setSelectedFileId(null);
+      }
+    }
+  };
+
+  const handleRename = () => {
+    if (selectedFileId) {
+      const file = files.find(f => f.id === selectedFileId);
+      if (file) {
+        const newName = prompt('Enter new name:', file.name);
+        if (newName) renameFile(selectedFileId, newName);
+      }
+    }
+  };
+
   const navigateTo = (id: string) => {
     setCurrentPath(prev => [...prev, id]);
+    setSelectedFileId(null);
   };
 
   const goBack = () => {
     if (currentPath.length > 1) {
       setCurrentPath(prev => prev.slice(0, -1));
+      setSelectedFileId(null);
     }
   };
 
@@ -27,13 +56,11 @@ export default function ExplorerApp({ windowId }: { windowId: string }) {
     if (file.type === 'folder') {
       navigateTo(file.id);
     } else {
-      // Opening logic based on file type
       if (file.mimeType === 'shortcut' && file.targetAppId) {
         const app = APPS[file.targetAppId];
         if (app) openWindow(app.id, app.name, app.defaultSize);
       } else if (file.mimeType === 'text/plain') {
         openWindow('notes', file.name, APPS['notes'].defaultSize);
-        // Note: we should pass default content but our window store doesn't support pass-through data yet
       }
     }
   };
@@ -87,11 +114,27 @@ export default function ExplorerApp({ windowId }: { windowId: string }) {
       {/* Command Bar */}
       <div className="flex items-center justify-between p-2 bg-slate-800/30 border-b border-white/5">
         <div className="flex gap-2">
-          <button className="px-3 py-1.5 text-sm hover:bg-white/10 rounded flex items-center gap-2">
-             <FileText size={16} className="text-blue-400" /> New
+          <button 
+            onClick={handleNewFolder}
+            className="px-3 py-1.5 text-sm hover:bg-white/10 rounded flex items-center gap-2 text-blue-400"
+          >
+             <Folder size={16} /> New Folder
           </button>
-          <button className="px-3 py-1.5 text-sm hover:bg-white/10 rounded">Sort</button>
-          <button className="px-3 py-1.5 text-sm hover:bg-white/10 rounded">View</button>
+          <div className="w-px h-4 bg-white/10 self-center mx-1" />
+          <button 
+            disabled={!selectedFileId}
+            onClick={handleRename}
+            className="px-3 py-1.5 text-sm hover:bg-white/10 rounded disabled:opacity-30 transition-opacity"
+          >
+            Rename
+          </button>
+          <button 
+            disabled={!selectedFileId}
+            onClick={handleDelete}
+            className="px-3 py-1.5 text-sm hover:bg-red-500/20 text-red-400 rounded disabled:opacity-30 transition-opacity"
+          >
+            Delete
+          </button>
         </div>
         <div className="flex items-center border border-white/10 rounded overflow-hidden">
           <button 
@@ -125,7 +168,10 @@ export default function ExplorerApp({ windowId }: { windowId: string }) {
          </div>
          
          {/* Main Content Area */}
-         <div className="flex-1 overflow-y-auto p-4 bg-slate-900/80">
+         <div 
+           className="flex-1 overflow-y-auto p-4 bg-slate-900/80"
+           onClick={() => setSelectedFileId(null)}
+         >
            {currentFiles.length === 0 ? (
              <div className="h-full flex flex-col items-center justify-center opacity-50">
                 <Folder size={48} className="mb-4 opacity-50 text-blue-400" />

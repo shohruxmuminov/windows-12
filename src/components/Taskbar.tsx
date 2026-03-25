@@ -4,6 +4,7 @@ import { APPS } from '@/registry/apps';
 import { useSystemStore } from '@/store/systemStore';
 import { Search, Grid, Wifi, Volume2, Battery, ChevronUp, Sparkles } from 'lucide-react';
 import StartMenu from './StartMenu';
+import { soundManager } from '@/utils/SoundManager';
 
 export default function Taskbar() {
   const [startOpen, setStartOpen] = useState(false);
@@ -15,6 +16,11 @@ export default function Taskbar() {
     isWidgetsOpen, setWidgetsOpen,
     isQuickSettingsOpen, setQuickSettingsOpen 
   } = useSystemStore();
+
+  const handleStartToggle = () => {
+    setStartOpen(!startOpen);
+    soundManager.play('click');
+  };
 
   useEffect(() => {
     const timer = setInterval(() => setTime(new Date()), 1000);
@@ -56,14 +62,17 @@ export default function Taskbar() {
           </button>
           
           {/* Search Button */}
-          <button className="p-2 rounded-md hover:bg-white/10 transition-all group">
+          <button 
+            className="p-2 rounded-md hover:bg-white/10 transition-all group"
+            onClick={() => soundManager.play('click')}
+          >
             <Search className="w-5 h-5 opacity-80 group-hover:opacity-100" />
           </button>
 
           {/* Copilot Button */}
           <button 
             className={`p-2 rounded-md transition-all group ${isCopilotOpen ? 'bg-blue-600/20 shadow-inner' : 'hover:bg-white/10'}`}
-            onClick={() => setCopilotOpen(!isCopilotOpen)}
+            onClick={() => { setCopilotOpen(!isCopilotOpen); soundManager.play('click'); }}
           >
             <Sparkles className={`w-5 h-5 ${isCopilotOpen ? 'text-blue-400' : 'opacity-80 group-hover:text-blue-400 opacity-100'} transition-colors`} />
           </button>
@@ -132,7 +141,7 @@ export default function Taskbar() {
           </button>
           <div 
             className={`flex items-center gap-2 px-2 py-1.5 rounded-md cursor-pointer transition ${isQuickSettingsOpen ? 'bg-white/20' : 'hover:bg-white/10'}`}
-            onClick={() => setQuickSettingsOpen(!isQuickSettingsOpen)}
+            onClick={() => { setQuickSettingsOpen(!isQuickSettingsOpen); soundManager.play('click'); }}
           >
             <Wifi className="w-4 h-4 opacity-80" />
             <Volume2 className="w-4 h-4 opacity-80" />

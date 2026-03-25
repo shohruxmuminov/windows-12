@@ -28,6 +28,8 @@ interface SystemState {
   setCopilotOpen: (isOpen: boolean) => void;
   setWidgetsOpen: (isOpen: boolean) => void;
   setQuickSettingsOpen: (isOpen: boolean) => void;
+  setUserName: (name: string) => void;
+  setUserAvatar: (avatar: string) => void;
 }
 
 export const useSystemStore = create<SystemState>()(
@@ -40,7 +42,7 @@ export const useSystemStore = create<SystemState>()(
       isMuted: false,
       isLocked: true,
       isBooted: false,
-      user: null,
+      user: { name: 'Demo User', avatar: 'DU', isGuest: false },
       setTheme: (theme) => set({ theme }),
       setWallpaper: (wallpaper) => set({ wallpaper }),
       setVolume: (volume) => set({ volume }),
@@ -55,6 +57,12 @@ export const useSystemStore = create<SystemState>()(
       setWidgetsOpen: (isWidgetsOpen) => set({ isWidgetsOpen }),
       isQuickSettingsOpen: false,
       setQuickSettingsOpen: (isQuickSettingsOpen) => set({ isQuickSettingsOpen }),
+      setUserName: (name) => set((state) => ({ 
+        user: state.user ? { ...state.user, name } : { name, avatar: 'U', isGuest: false } 
+      })),
+      setUserAvatar: (avatar) => set((state) => ({ 
+        user: state.user ? { ...state.user, avatar } : { name: 'User', avatar, isGuest: false } 
+      })),
     }),
     {
       name: 'windows-12-system',
