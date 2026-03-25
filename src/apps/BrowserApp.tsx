@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronLeft, ChevronRight, RotateCw, Home, Search, Star, MoreVertical, Plus, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, RotateCw, Home, Search, Star, MoreVertical, Plus, X, Globe } from 'lucide-react';
 
 export default function BrowserApp({ windowId }: { windowId: string }) {
   const [urlInput, setUrlInput] = useState('windows12.dev');

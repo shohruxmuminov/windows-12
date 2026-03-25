@@ -139,5 +139,47 @@ export const useWindowStore = create<WindowState>((set, get) => ({
     }));
   },
   
+  snapWindow: (id, type) => {
+    const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1280;
+    const screenHeight = (typeof window !== 'undefined' ? window.innerHeight : 720) - 48;
+
+    let position = { x: 0, y: 0 };
+    let size = { width: screenWidth / 2, height: screenHeight };
+
+    switch (type) {
+      case 'left':
+        position = { x: 0, y: 0 };
+        size = { width: screenWidth / 2, height: screenHeight };
+        break;
+      case 'right':
+        position = { x: screenWidth / 2, y: 0 };
+        size = { width: screenWidth / 2, height: screenHeight };
+        break;
+      case 'top-left':
+        position = { x: 0, y: 0 };
+        size = { width: screenWidth / 2, height: screenHeight / 2 };
+        break;
+      case 'top-right':
+        position = { x: screenWidth / 2, y: 0 };
+        size = { width: screenWidth / 2, height: screenHeight / 2 };
+        break;
+      case 'bottom-left':
+        position = { x: 0, y: screenHeight / 2 };
+        size = { width: screenWidth / 2, height: screenHeight / 2 };
+        break;
+      case 'bottom-right':
+        position = { x: screenWidth / 2, y: screenHeight / 2 };
+        size = { width: screenWidth / 2, height: screenHeight / 2 };
+        break;
+    }
+
+    set((state) => ({
+      windows: state.windows.map((w) =>
+        w.id === id ? { ...w, position, size, isMaximized: false, isMinimized: false } : w
+      ),
+    }));
+    get().focusWindow(id);
+  },
+  
   closeAll: () => set({ windows: [], focusedWindowId: null })
 }));
